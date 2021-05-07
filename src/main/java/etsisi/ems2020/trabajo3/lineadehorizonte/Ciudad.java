@@ -146,46 +146,59 @@ return linea;
 
         if (puntos.getP1().getX() < puntos.getP2().getX())  // si X del s1 es menor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(puntos.paux, puntos.p1, aux, salida, s1);
+        	lineaHorizonteFussionExtra1(puntos, aux, salida, s1);
         }
         else if (puntos.getP1().getX() > puntos.getP2().getX()) // si X del s1 es mayor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(puntos.paux, puntos.p2, aux, salida, s2);
+        	lineaHorizonteFussionExtra3(puntos, aux, salida, s2);
         }
         else // si la X del s1 es igual a la X del s2
         {
-        	lineaHorizonteFussionExtra2(puntos.p1,puntos.p2,aux, salida, s1,s2);
+        	lineaHorizonteFussionExtra2(puntos,aux, salida, s1,s2);
         }
     	
     }
     
-    public void lineaHorizonteFussionExtra1(Punto paux, Punto p, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s)
+    public void lineaHorizonteFussionExtra1(conjuntoPuntos puntos, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s)
     {
-        paux.setX(p.getX());                // guardamos en paux esa X
-        paux.setY(Math.max(p.getY(), aux.getS2y())); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
+        puntos.getPaux().setX(puntos.getP1().getX());                // guardamos en paux esa X
+        puntos.paux.setY(Math.max(puntos.getP1().getY(), aux.getS2y())); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
         
-        if (paux.getY()!=aux.getPrev()) // si este maximo no es igual al del segmento anterior
+        if (puntos.paux.getY()!=aux.getPrev()) // si este maximo no es igual al del segmento anterior
         {
-            salida.addPunto(paux); // añadimos el punto al LineaHorizonte de salida
-            aux.setPrev(paux.getY());    // actualizamos prev
+            salida.addPunto(puntos.paux); // añadimos el punto al LineaHorizonte de salida
+            aux.setPrev(puntos.paux.getY());    // actualizamos prev
         }
-        aux.setS1y(p.getY());   // actualizamos la altura s1y
+        aux.setS1y(puntos.p1.getY());   // actualizamos la altura s1y
         s.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
     }
-    public void lineaHorizonteFussionExtra2(Punto p1, Punto p2, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s1, LineaHorizonte s2)
+    public void lineaHorizonteFussionExtra3(conjuntoPuntos puntos, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s)
     {
-        if ((p1.getY() > p2.getY()) && (p1.getY()!=aux.getPrev())) // guardaremos aquel punto que tenga la altura mas alta
+        puntos.getPaux().setX(puntos.getP2().getX());                // guardamos en paux esa X
+        puntos.paux.setY(Math.max(puntos.getP2().getY(), aux.getS2y())); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
+        
+        if (puntos.paux.getY()!=aux.getPrev()) // si este maximo no es igual al del segmento anterior
         {
-            salida.addPunto(p1);
-            aux.setPrev(p1.getY());
+            salida.addPunto(puntos.paux); // añadimos el punto al LineaHorizonte de salida
+            aux.setPrev(puntos.paux.getY());    // actualizamos prev
         }
-        if ((p1.getY() <= p2.getY()) && (p2.getY()!=aux.getPrev()))
+        aux.setS1y(puntos.p2.getY());   // actualizamos la altura s1y
+        s.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
+    }
+    public void lineaHorizonteFussionExtra2(conjuntoPuntos puntos, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s1, LineaHorizonte s2)
+    {
+        if ((puntos.p1.getY() > puntos.p2.getY()) && (puntos.p1.getY()!=aux.getPrev())) // guardaremos aquel punto que tenga la altura mas alta
         {
-            salida.addPunto(p2);
-            aux.setPrev(p2.getY());
+            salida.addPunto(puntos.p1);
+            aux.setPrev(puntos.p1.getY());
         }
-        aux.setS1y(p1.getY());   // actualizamos la s1y e s2y
-        aux.setS2y(p2.getY());
+        if ((puntos.p1.getY() <= puntos.p2.getY()) && (puntos.p2.getY()!=aux.getPrev()))
+        {
+            salida.addPunto(puntos.p2);
+            aux.setPrev(puntos.p2.getY());
+        }
+        aux.setS1y(puntos.p1.getY());   // actualizamos la s1y e s2y
+        aux.setS2y(puntos.p2.getY());
         s1.borrarPunto(0); // eliminamos el punto del s1 y del s2
         s2.borrarPunto(0);
     }
