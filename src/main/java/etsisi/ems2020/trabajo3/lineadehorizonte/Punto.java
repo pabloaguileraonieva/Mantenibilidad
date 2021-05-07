@@ -27,6 +27,7 @@ public class Punto {
         this.x = x;
         this.y = y;
     }
+    
     /*
      * 
      * Get de la coordenada X

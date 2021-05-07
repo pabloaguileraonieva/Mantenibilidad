@@ -102,7 +102,7 @@ return linea;
      */
     public LineaHorizonte LineaHorizonteFussion(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux)
     {
-        int prev=-1;
+        historialAlturas aux=new historialAlturas();
     	LineaHorizonte salida = new LineaHorizonte(); // LineaHorizonte de salida
         
         p1 = new Punto();         // punto donde guardaremos el primer punto del LineaHorizonte s1
@@ -113,16 +113,16 @@ return linea;
         //Mientras tengamos elementos en s1 y en s2
         while ((!s1.isEmpty()) && (!s2.isEmpty())) 
         {
-        	lineaHorizonteFussionExtra(s1,s2,p1,p2,paux,prev,salida);
+        	lineaHorizonteFussionExtra(s1,s2,p1,p2,paux,aux,salida);
         }
         while ((!s1.isEmpty())) //si aun nos quedan elementos en el s1
         {
             paux=s1.getPunto(0); // guardamos en paux el primer punto
             
-            if (paux.getY()!=prev) // si paux no tiene la misma altura del segmento previo
+            if (paux.getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
             {
                 salida.addPunto(paux); // lo añadimos al LineaHorizonte de salida
-                prev = paux.getY();    // y actualizamos prev
+                aux.setPrev(paux.getY());    // y actualizamos prev
             }
             s1.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
         }
@@ -130,66 +130,64 @@ return linea;
         {
             paux=s2.getPunto(0); // guardamos en paux el primer punto
            
-            if (paux.getY()!=prev) // si paux no tiene la misma altura del segmento previo
+            if (paux.getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
             {
                 salida.addPunto(paux); // lo añadimos al LineaHorizonte de salida
-                prev = paux.getY();    // y actualizamos prev
+                aux.setPrev(paux.getY());    // y actualizamos prev
             }
             s2.borrarPunto(0); // en cualquier caso eliminamos el punto de s2 (tanto si se añade como si no es valido)
         }
         return salida;
     }
     
-    public void lineaHorizonteFussionExtra(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux, int prev, LineaHorizonte salida)
+    public void lineaHorizonteFussionExtra(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux, historialAlturas aux, LineaHorizonte salida)
     {
         paux = new Punto();  // Inicializamos la variable paux
         p1 = s1.getPunto(0); // guardamos el primer elemento de s1
         p2 = s2.getPunto(0); // guardamos el primer elemento de s2
-    	// en estas variables guardaremos las alturas de los puntos anteriores, en s1y la del s1, en s2y la del s2 
-    	// y en prev guardaremos la previa del segmento anterior introducido
-        int s1y=-1, s2y=-1;
+
         if (p1.getX() < p2.getX())  // si X del s1 es menor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(paux, p1, s1y, s2y, prev, salida, s1);
+        	lineaHorizonteFussionExtra1(paux, p1, aux, salida, s1);
         }
         else if (p1.getX() > p2.getX()) // si X del s1 es mayor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(paux, p2, s2y, s1y, prev, salida, s2);
+        	lineaHorizonteFussionExtra1(paux, p2, aux, salida, s2);
         }
         else // si la X del s1 es igual a la X del s2
         {
-        	lineaHorizonteFussionExtra2(p1,p2,prev, salida, s1y, s2y, s1,s2);
+        	lineaHorizonteFussionExtra2(p1,p2,aux, salida, s1,s2);
         }
     	
     }
     
-    public void lineaHorizonteFussionExtra1(Punto paux, Punto p, int s1y, int s2y, int prev, LineaHorizonte salida, LineaHorizonte s)
+    public void lineaHorizonteFussionExtra1(Punto paux, Punto p, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s)
     {
         paux.setX(p.getX());                // guardamos en paux esa X
-        paux.setY(Math.max(p.getY(), s2y)); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
+        paux.setY(Math.max(p.getY(), aux.getS2y())); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
         
-        if (paux.getY()!=prev) // si este maximo no es igual al del segmento anterior
+        if (paux.getY()!=aux.getPrev()) // si este maximo no es igual al del segmento anterior
         {
             salida.addPunto(paux); // añadimos el punto al LineaHorizonte de salida
-            prev = paux.getY();    // actualizamos prev
+            aux.setPrev(paux.getY());    // actualizamos prev
         }
-        s1y = p.getY();   // actualizamos la altura s1y
+        aux.setS1y(p.getY());   // actualizamos la altura s1y
         s.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
     }
-    public void lineaHorizonteFussionExtra2(Punto p1, Punto p2, int prev, LineaHorizonte salida, int s1y, int s2y, LineaHorizonte s1, LineaHorizonte s2)
+    public void lineaHorizonteFussionExtra2(Punto p1, Punto p2, historialAlturas aux, LineaHorizonte salida, LineaHorizonte s1, LineaHorizonte s2)
     {
-        if ((p1.getY() > p2.getY()) && (p1.getY()!=prev)) // guardaremos aquel punto que tenga la altura mas alta
+        if ((p1.getY() > p2.getY()) && (p1.getY()!=aux.getPrev())) // guardaremos aquel punto que tenga la altura mas alta
         {
             salida.addPunto(p1);
-            prev = p1.getY();
+            aux.setPrev(p1.getY());
         }
-        if ((p1.getY() <= p2.getY()) && (p2.getY()!=prev))
+        if ((p1.getY() <= p2.getY()) && (p2.getY()!=aux.getPrev()))
         {
             salida.addPunto(p2);
-            prev = p2.getY();
+            aux.setPrev(p2.getY());
         }
-        s1y = p1.getY();   // actualizamos la s1y e s2y
-        s2y = p2.getY();
+        aux.setS1y(p1.getY());   // actualizamos la s1y e s2y
+        aux.setS2y(p2.getY());
         s1.borrarPunto(0); // eliminamos el punto del s1 y del s2
         s2.borrarPunto(0);
     }
