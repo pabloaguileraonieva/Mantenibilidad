@@ -88,8 +88,8 @@ int medio=(pi+pd)/2;
 
 LineaHorizonte s1 = this.crearLineaHorizonte(pi,medio);  
 LineaHorizonte s2 = this.crearLineaHorizonte(medio+1,pd);
-Punto a=null, b=null, aux=null;
-linea = LineaHorizonteFussion(s1,s2,a,b,aux); 
+conjuntoPuntos puntos=new conjuntoPuntos();
+linea = LineaHorizonteFussion(s1,s2,puntos); 
 }
 return linea;
     }
@@ -100,63 +100,61 @@ return linea;
      * edificio solapa a otro, si hay edificios contiguos, etc. y solucionar dichos
      * problemas para que el LineaHorizonte calculado sea el correcto.
      */
-    public LineaHorizonte LineaHorizonteFussion(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux)
+    public LineaHorizonte LineaHorizonteFussion(LineaHorizonte s1,LineaHorizonte s2, conjuntoPuntos puntos)
     {
         historialAlturas aux=new historialAlturas();
     	LineaHorizonte salida = new LineaHorizonte(); // LineaHorizonte de salida
-        
-        p1 = new Punto();         // punto donde guardaremos el primer punto del LineaHorizonte s1
-        p2 = new Punto();         // punto donde guardaremos el primer punto del LineaHorizonte s2
+
         
         imprimirLineas(s1,s2);
         
         //Mientras tengamos elementos en s1 y en s2
         while ((!s1.isEmpty()) && (!s2.isEmpty())) 
         {
-        	lineaHorizonteFussionExtra(s1,s2,p1,p2,paux,aux,salida);
+        	lineaHorizonteFussionExtra(s1,s2,puntos,aux,salida);
         }
         while ((!s1.isEmpty())) //si aun nos quedan elementos en el s1
         {
-            paux=s1.getPunto(0); // guardamos en paux el primer punto
+            puntos.setPaux(s1.getPunto(0)); // guardamos en paux el primer punto
             
-            if (paux.getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
+            if (puntos.getPaux().getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
             {
-                salida.addPunto(paux); // lo añadimos al LineaHorizonte de salida
-                aux.setPrev(paux.getY());    // y actualizamos prev
+                salida.addPunto(puntos.getPaux()); // lo añadimos al LineaHorizonte de salida
+                aux.setPrev(puntos.getPaux().getY());    // y actualizamos prev
             }
             s1.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
         }
         while((!s2.isEmpty())) //si aun nos quedan elementos en el s2
         {
-            paux=s2.getPunto(0); // guardamos en paux el primer punto
+            puntos.setPaux(s2.getPunto(0)); // guardamos en paux el primer punto
            
-            if (paux.getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
+            if (puntos.getPaux().getY()!=aux.getPrev()) // si paux no tiene la misma altura del segmento previo
             {
-                salida.addPunto(paux); // lo añadimos al LineaHorizonte de salida
-                aux.setPrev(paux.getY());    // y actualizamos prev
+                salida.addPunto(puntos.getPaux()); // lo añadimos al LineaHorizonte de salida
+                aux.setPrev(puntos.getPaux().getY());    // y actualizamos prev
             }
             s2.borrarPunto(0); // en cualquier caso eliminamos el punto de s2 (tanto si se añade como si no es valido)
         }
         return salida;
     }
     
-    public void lineaHorizonteFussionExtra(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux, historialAlturas aux, LineaHorizonte salida)
+    public void lineaHorizonteFussionExtra(LineaHorizonte s1,LineaHorizonte s2, conjuntoPuntos puntos, historialAlturas aux, LineaHorizonte salida)
     {
-        paux = new Punto();  // Inicializamos la variable paux
-        p1 = s1.getPunto(0); // guardamos el primer elemento de s1
-        p2 = s2.getPunto(0); // guardamos el primer elemento de s2
+        puntos.paux = new Punto();  // Inicializamos la variable paux
+        puntos.setP1(s1.getPunto(0)); // guardamos el primer elemento de s1
+        puntos.setP2(s2.getPunto(0)); // guardamos el primer elemento de s2
 
-        if (p1.getX() < p2.getX())  // si X del s1 es menor que la X del s2
+        if (puntos.getP1().getX() < puntos.getP2().getX())  // si X del s1 es menor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(paux, p1, aux, salida, s1);
+        	lineaHorizonteFussionExtra1(puntos.paux, puntos.p1, aux, salida, s1);
         }
-        else if (p1.getX() > p2.getX()) // si X del s1 es mayor que la X del s2
+        else if (puntos.getP1().getX() > puntos.getP2().getX()) // si X del s1 es mayor que la X del s2
         {
-        	lineaHorizonteFussionExtra1(paux, p2, aux, salida, s2);
+        	lineaHorizonteFussionExtra1(puntos.paux, puntos.p2, aux, salida, s2);
         }
         else // si la X del s1 es igual a la X del s2
         {
-        	lineaHorizonteFussionExtra2(p1,p2,aux, salida, s1,s2);
+        	lineaHorizonteFussionExtra2(puntos.p1,puntos.p2,aux, salida, s1,s2);
         }
     	
     }
