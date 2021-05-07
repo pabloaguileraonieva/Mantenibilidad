@@ -102,72 +102,18 @@ return linea;
      */
     public LineaHorizonte LineaHorizonteFussion(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux)
     {
-    	// en estas variables guardaremos las alturas de los puntos anteriores, en s1y la del s1, en s2y la del s2 
-    	// y en prev guardaremos la previa del segmento anterior introducido
-        int s1y=-1, s2y=-1, prev=-1;    
-        LineaHorizonte salida = new LineaHorizonte(); // LineaHorizonte de salida
+        int prev=-1;
+    	LineaHorizonte salida = new LineaHorizonte(); // LineaHorizonte de salida
         
         p1 = new Punto();         // punto donde guardaremos el primer punto del LineaHorizonte s1
         p2 = new Punto();         // punto donde guardaremos el primer punto del LineaHorizonte s2
         
-        System.out.println("==== S1 ====");
-        s1.imprimir();
-        System.out.println("==== S2 ====");
-        s2.imprimir();
-        System.out.println("\n");
-        
-        
+        imprimirLineas(s1,s2);
         
         //Mientras tengamos elementos en s1 y en s2
         while ((!s1.isEmpty()) && (!s2.isEmpty())) 
         {
-            paux = new Punto();  // Inicializamos la variable paux
-            p1 = s1.getPunto(0); // guardamos el primer elemento de s1
-            p2 = s2.getPunto(0); // guardamos el primer elemento de s2
-
-            if (p1.getX() < p2.getX()) // si X del s1 es menor que la X del s2
-            {
-                paux.setX(p1.getX());                // guardamos en paux esa X
-                paux.setY(Math.max(p1.getY(), s2y)); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
-                
-                if (paux.getY()!=prev) // si este maximo no es igual al del segmento anterior
-                {
-                    salida.addPunto(paux); // añadimos el punto al LineaHorizonte de salida
-                    prev = paux.getY();    // actualizamos prev
-                }
-                s1y = p1.getY();   // actualizamos la altura s1y
-                s1.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
-            }
-            else if (p1.getX() > p2.getX()) // si X del s1 es mayor que la X del s2
-            {
-                paux.setX(p2.getX());                // guardamos en paux esa X
-                paux.setY(Math.max(p2.getY(), s1y)); // y hacemos que el maximo entre la Y del s2 y la altura previa del s1 sea la altura Y de paux
-
-                if (paux.getY()!=prev) // si este maximo no es igual al del segmento anterior
-                {
-                    salida.addPunto(paux); // añadimos el punto al LineaHorizonte de salida
-                    prev = paux.getY();    // actualizamos prev
-                }
-                s2y = p2.getY();   // actualizamos la altura s2y
-                s2.borrarPunto(0); // en cualquier caso eliminamos el punto de s2 (tanto si se añade como si no es valido)
-            }
-            else // si la X del s1 es igual a la X del s2
-            {
-                if ((p1.getY() > p2.getY()) && (p1.getY()!=prev)) // guardaremos aquel punto que tenga la altura mas alta
-                {
-                    salida.addPunto(p1);
-                    prev = p1.getY();
-                }
-                if ((p1.getY() <= p2.getY()) && (p2.getY()!=prev))
-                {
-                    salida.addPunto(p2);
-                    prev = p2.getY();
-                }
-                s1y = p1.getY();   // actualizamos la s1y e s2y
-                s2y = p2.getY();
-                s1.borrarPunto(0); // eliminamos el punto del s1 y del s2
-                s2.borrarPunto(0);
-            }
+        	lineaHorizonteFussionExtra(s1,s2,p1,p2,paux,prev,salida);
         }
         while ((!s1.isEmpty())) //si aun nos quedan elementos en el s1
         {
@@ -193,6 +139,61 @@ return linea;
         }
         return salida;
     }
+    
+    public void lineaHorizonteFussionExtra(LineaHorizonte s1,LineaHorizonte s2, Punto p1, Punto p2, Punto paux, int prev, LineaHorizonte salida)
+    {
+        paux = new Punto();  // Inicializamos la variable paux
+        p1 = s1.getPunto(0); // guardamos el primer elemento de s1
+        p2 = s2.getPunto(0); // guardamos el primer elemento de s2
+    	// en estas variables guardaremos las alturas de los puntos anteriores, en s1y la del s1, en s2y la del s2 
+    	// y en prev guardaremos la previa del segmento anterior introducido
+        int s1y=-1, s2y=-1;
+        if (p1.getX() < p2.getX())  // si X del s1 es menor que la X del s2
+        {
+        	lineaHorizonteFussionExtra1(paux, p1, s1y, s2y, prev, salida, s1);
+        }
+        else if (p1.getX() > p2.getX()) // si X del s1 es mayor que la X del s2
+        {
+        	lineaHorizonteFussionExtra1(paux, p2, s2y, s1y, prev, salida, s2);
+        }
+        else // si la X del s1 es igual a la X del s2
+        {
+        	lineaHorizonteFussionExtra2(p1,p2,prev, salida, s1y, s2y, s1,s2);
+        }
+    	
+    }
+    
+    public void lineaHorizonteFussionExtra1(Punto paux, Punto p, int s1y, int s2y, int prev, LineaHorizonte salida, LineaHorizonte s)
+    {
+        paux.setX(p.getX());                // guardamos en paux esa X
+        paux.setY(Math.max(p.getY(), s2y)); // y hacemos que el maximo entre la Y del s1 y la altura previa del s2 sea la altura Y de paux
+        
+        if (paux.getY()!=prev) // si este maximo no es igual al del segmento anterior
+        {
+            salida.addPunto(paux); // añadimos el punto al LineaHorizonte de salida
+            prev = paux.getY();    // actualizamos prev
+        }
+        s1y = p.getY();   // actualizamos la altura s1y
+        s.borrarPunto(0); // en cualquier caso eliminamos el punto de s1 (tanto si se añade como si no es valido)
+    }
+    public void lineaHorizonteFussionExtra2(Punto p1, Punto p2, int prev, LineaHorizonte salida, int s1y, int s2y, LineaHorizonte s1, LineaHorizonte s2)
+    {
+        if ((p1.getY() > p2.getY()) && (p1.getY()!=prev)) // guardaremos aquel punto que tenga la altura mas alta
+        {
+            salida.addPunto(p1);
+            prev = p1.getY();
+        }
+        if ((p1.getY() <= p2.getY()) && (p2.getY()!=prev))
+        {
+            salida.addPunto(p2);
+            prev = p2.getY();
+        }
+        s1y = p1.getY();   // actualizamos la s1y e s2y
+        s2y = p2.getY();
+        s1.borrarPunto(0); // eliminamos el punto del s1 y del s2
+        s2.borrarPunto(0);
+    }
+
     /*
      Método que carga los edificios que me pasan en el
      archivo cuyo nombre se encuentra en "fichero".
@@ -213,5 +214,14 @@ return linea;
             }
         }
         catch(Exception e){}     
+    }
+    
+    public void imprimirLineas(LineaHorizonte s1, LineaHorizonte s2)
+    {
+        System.out.println("==== S1 ====");
+        s1.imprimir();
+        System.out.println("==== S2 ====");
+        s2.imprimir();
+        System.out.println("\n");
     }
 }
